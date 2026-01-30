@@ -1,36 +1,56 @@
 import feedparser, json, time
 
+# Feeds that reliably return RSS content
 feeds = [
     "https://blog.adobe.com/en/topics/trends-research.rss",
-    "https://www.avid.com/blog/rss.xml",
     "https://feeds.feedburner.com/venturebeat/SZZv",
     "https://www.tvtechnology.com/.rss/full/",
-    "https://www.thebroadcastbridge.com/home/rss",
-    "https://newsroom.cisco.com/c/r/newsroom/en/us/rss/security.xml",
-    "https://www.ncsc.gov.uk/information/rss-feeds",
-    "https://www.broadcastprome.com/feed/"
+    "https://www.broadcastprome.com/feed/",
+    "https://www.cisco.com/c/r/newsroom/en/us/rss/security.xml"
 ]
 
 items = []
 
+headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+
 for url in feeds:
-    d = feedparser.parse(url)
+    try:
+        # Parse with headers
+        d = feedparser.parse(url, request_headers=headers)
 
-    for e in d.entries[:10]:
-        title = e.get("title", "").strip()
-        summary = e.get("summary", e.get("description", "")).strip()
+        # Skip empty feeds
+        if not d.entries:
+            print("EMPTY FEED:", url)
+            continue
 
-        if not title:
-            continue  # skip invalid articles
+        for e in d.entries[:10]:
+            title = e.get("title", "").strip()
+            summary = e.get("summary", e.get("description", "")).strip()
 
-        items.append({
-            "title": title,
-            "summary": summary,
-            "category": "General",
-            "source": url,
-            "published": e.get("published", time.strftime("%Y-%m-%d"))
-        })
+            if not title:
+                continue
 
-# Save output
+            items.append({
+                "title": title,
+                "summary": summary,
+                "category": "General",
+                "source": url,
+                "published": e.get("published", time.strftime("%Y-%m-%d"))
+            })
+
+    except Exception as ex:
+        print("Error:", url, ex)
+        continue
+
+# If still empty, provide fallback
+if not items:
+    items = [{
+        "title": "Fallback Article",
+        "summary": "RSS temporarily unavailable.",
+        "category": "General",
+        "source": "local",
+        "published": time.strftime("%Y-%m-%d")
+    }]
+
 with open("data.json", "w") as f:
     json.dump({"items": items}, f, indent=2)
