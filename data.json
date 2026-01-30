@@ -1,1 +1,18 @@
-{"items": []}
+{
+  "items": [
+    {
+      "title": "Test Story 1 — MediaTech working",
+      "summary": "Your UI is loading correctly. This test story shows everything is functional.",
+      "category": "General",
+      "source": "local",
+      "published": "2026-01-30"
+    },
+    {
+      "title": "Test Story 2 — Feed fix incoming",
+      "summary": "Once fetch_news.py is fixed, this list will auto-update from real feeds.",
+      "category": "General",
+      "source": "local",
+      "published": "2026-01-30"
+    }
+  ]
+}
